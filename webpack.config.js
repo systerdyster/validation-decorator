@@ -29,7 +29,7 @@ module.exports = (env = {}, argv = {}) => {
                 template: './src/index.html',
                 inject: true,
                 filename: 'index.html',
-                title: 'Ninetech - Arbetsprov UI',
+                title: 'Www',
                 chunksSortMode: 'none'
             }),
             new miniCssExtractPlugin({
