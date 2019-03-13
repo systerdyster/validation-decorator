@@ -1,13 +1,11 @@
 import "../style/style.sass"
-import { Form } from "./models/Form";
+import { Template } from "./models/Template";
 
-const f = new Form();
+const f = new Template();
 f.name = 'Fredrik';
-f.age = 36;
 
-const y = new Form();
+const y = new Template();
 y.name = "ulf";
-y.age = 25;
 
 (<any>window).f = f;
 (<any>window).y = y;
