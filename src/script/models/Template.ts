@@ -1,5 +1,5 @@
 import { ValidationForm } from 'script/validation/ValidationModels';
-import { ValidateIsMinHandler, ValidateIsMatchHandler, ValidateIsRequiredHandler } from 'script/validation/handlers';
+import { ValidateIsMinHandler, ValidateIsMatchHandler, ValidateIsRequiredHandler, ValidateIsValidAsyncHandler } from 'script/validation/handlers';
 import { ValidateProp } from 'script/validation/ValidationDecorator';
 
 export class Template extends ValidationForm {
@@ -15,7 +15,9 @@ export class Template extends ValidationForm {
         validators: [
             x => ValidateIsMinHandler(x, 5), 
             x => ValidateIsMatchHandler(x, /^[a-zA-Z0-9]+$/)
-        ]})
+        ],
+        asyncValidators: [x => ValidateIsValidAsyncHandler(x)]
+    })
     public eventCode: string;
     
     public description: string;

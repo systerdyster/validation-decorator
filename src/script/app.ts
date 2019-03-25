@@ -1,4 +1,3 @@
-import "../style/style.sass"
 import { Template } from "./models/Template";
 
 const f = new Template();

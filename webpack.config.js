@@ -3,11 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
-const miniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (env = {}, argv = {}) => {
-    const cssFile = 'style-[hash:14].min.css';
-    const assetNames = 'assets/[name]-[hash:14].[ext]';
 
     var config = {
 
@@ -31,11 +28,7 @@ module.exports = (env = {}, argv = {}) => {
                 filename: 'index.html',
                 title: 'Www',
                 chunksSortMode: 'none'
-            }),
-            new miniCssExtractPlugin({
-                filename: cssFile
-            }),
-            new webpack.HashedModuleIdsPlugin()
+            })
         ],
 
         performance: {
@@ -50,49 +43,12 @@ module.exports = (env = {}, argv = {}) => {
                     include: [
                         path.join(__dirname, "src")
                     ]
-                },  
-                {
-                    test: /\.(sass|scss)$/,
-                    use: [
-                        {
-                            loader: miniCssExtractPlugin.loader
-                        },
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                importLoaders: 1,
-                                sourceMap: false
-                            }
-                        }, 'sass-loader?sourceMap=false'],
-                    include: [
-                        path.join(__dirname, "src/style")
-                    ]
-                },
-                {
-                    test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-                    use: 'url-loader?limit=1000&mimetype=application/font-woff&name=' + assetNames
-                },
-                {
-                    test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                    use: 'url-loader?limit=1000&mimetype=application/octet-stream&name=' + assetNames
-                },
-                {
-                    test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                    use: 'file-loader?name=' + assetNames
-                },
-                {
-                    test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                    use: 'url-loader?limit=1000&mimetype=image/svg+xml&name=' + assetNames
-                },
-                {
-                    test: /\.(png|jpg|gif)$/,
-                    use: 'url-loader?limit=1000&name=' + assetNames
                 }
             ]
         },
 
         resolve: {
-            extensions: [".ts", ".js", ".sass", ".scss"],
+            extensions: [".ts", ".js"],
             modules: [ path.resolve(__dirname, 'src'), "node_modules" ]
         }
     };

@@ -1,6 +1,58 @@
 import { ValidationOptions, ValidationResponse } from './ValidationModels';
 
 export function ValidateProp(options: ValidationOptions) : PropertyDecorator {
+
+    const evaluateHandlers = (_this: any, _key: string, nextValue: any) : boolean => {
+        const validators: Array<(value: any) => ValidationResponse> = _this.__validation[_key].__validators;
+        let isValid = true;
+        let count = 0;
+
+        if (validators.length > 0) {
+            for (let i = 0; i < validators.length; i++) {
+                const result = validators[i](nextValue);
+                if (!result.isValid) {
+                    isValid = false;
+                    let key = String(count);
+                    if (result.errorMsg) {
+                        key = result.errorMsg;
+                    }
+                    if (!_this.__validation[_key].$error) {
+                        _this.__validation[_key].$error = [];
+                    }
+                    _this.__validation[_key].$error.push(key);
+                }
+                count++;
+            };
+        }
+        return isValid;
+    }
+
+    const evaluteAsyncHandlers = async (_this: any, _key: string, nextValue: any) : Promise<boolean> => {
+        const validators: Array<(value: any) => Promise<ValidationResponse>> = _this.__validation[_key].__asyncValidators;
+        let isValid = true;
+        let count = 100;
+
+        if (validators.length > 0) {
+            for (let i = 0; i < validators.length; i++) {
+                const result = await validators[i](nextValue);
+
+                if (!result.isValid) {
+                    isValid = false;
+                    let key = String(count);
+                    if (result.errorMsg) {
+                        key = result.errorMsg;
+                    }
+                    if (!_this.__validation[_key].$error) {
+                        _this.__validation[_key].$error = [];
+                    }
+                    _this.__validation[_key].$error.push(key);
+                }
+                count++;
+            }
+        }
+        return isValid;
+    }
+
     return function (target: any, propertyName: string | symbol) {
         const _key = `${String(propertyName)}`;
         const _validators: Array<(value: any) => ValidationResponse> = [];
@@ -52,50 +104,15 @@ export function ValidateProp(options: ValidationOptions) : PropertyDecorator {
             });
         }
 
-        function validate (_this: any, next: any) {
-            let isValid = true;
-            let count = 0;
+        const validate = async (_this: any, nextValue: any) => {
             delete _this.__validation[_key].$error;
             _this.__validation[_key].$isPending = true;
             
-            if (_this.__validation[_key].__validators.length > 0) {
-                _this.__validation[_key].__validators.forEach((validator: Function) => {
-                    const result = validator(next);
-                    if (!result.isValid) {
-                        isValid = false;
-                        let key = String(count);
-                        if (result.errorMsg) {
-                            key = result.errorMsg;
-                        }
-                        if (!_this.__validation[_key].$error) {
-                            _this.__validation[_key].$error = [];
-                        }
-                        _this.__validation[_key].$error.push(key);
-                    }
-                    count++;
-                });
-            }
-
-            if (_this.__validation[_key].__asyncValidators.length > 0) {
-                _this.__validation[_key].__asyncValidators.forEach(async (validator: Function) => {
-                    const result = await validator(next);
-                    if (!result.isValid) {
-                        isValid = false;
-                        let key = String(count);
-                        if (result.errorMsg) {
-                            key = result.errorMsg;
-                        }
-                        if (!_this.__validation[_key].$error) {
-                            _this.__validation[_key].$error = [];
-                        }
-                        _this.__validation[_key].$error.push(key);
-                    }
-                    count++;
-                });
-            }
+            let syncIsValid = evaluateHandlers(_this, _key, nextValue);
+            let asyncIsValid = await evaluteAsyncHandlers(_this, _key, nextValue, );
 
             _this.__validation[_key].$isPending = false;
-            _this.__validation[_key].$isValid = isValid;
+            _this.__validation[_key].$isValid = (syncIsValid && asyncIsValid);
             _this.__validation[_key].$isDirty = true;
         };
 
@@ -110,7 +127,7 @@ export function ValidateProp(options: ValidationOptions) : PropertyDecorator {
 
             Object.defineProperty(_this.__validation, _key, {
                 value: { 
-                    '$isValid': true, 
+                    '$isValid': false, 
                     '$isDirty': false, 
                     '$isPending': false,
                     '__validators': _validators,
