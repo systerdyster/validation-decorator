@@ -71,8 +71,15 @@ On the prototype you also have a detailed property called __ __validation.__ Her
 
 ``` typescript
 myTemplate.__validation.eventCode.$isValid  //false
-myTemplate.__validation.eventCode.$error  // ['isMin']
+myTemplate.__validation.eventCode.$error  // ['isMin', 'isMatch']
 ```
+So you could possibly display seperate errors messages depending on what the pain is by checking
+
+```typescript
+myTemplate.__validation.eventCode.$error.isMin
+myTemplate.__validation.eventCode.$error.isMatch
+```
+If there is no error, the message with not exist. So you can always check if truthy and know there is an error.
 
 In the same way you can also see if a validation is pending, for whole object or for specific property.
 
