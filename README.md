@@ -51,10 +51,10 @@ export class Template extends ValidationForm {
 The inheritance is only for type-help when accessing stuff. So not needed for it to work. If you don't care about your typescript you can ignore it.
 
 ## anyway.
-What happen is that when decorated, then prototype is modified to contain information on what is supposed to happen. The properties decorated get their 'setters' modified, to validate when used. So when editing the value, it is automaticly evaluated and updated.
+What happen is that when decorated, then prototype is modified to contain information on what is supposed to happen. The properties decorated get their 'setters' modified, to validate when used. So when editing the value, it is automaticly evaluated and updated, however you edit it.
 
 ## the good stuff.
-on the prototype, you can find a new property called $validation with 3 boolean values. $isDirty, $isPending, $isValid. These refer to the while object.
+on the prototype, you can find a new property called $validation with 3 boolean values. $isDirty, $isPending, $isValid. These refer to the whole object and can tell you if the model is valid or not, no need to loop and check properties individual.
 
 So for example if you wish to see if you model is valid, you can check against this property.
 
